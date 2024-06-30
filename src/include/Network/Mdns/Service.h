@@ -78,7 +78,7 @@ public:
 	 *
 	 * Called whenever a TXT reply is created.
 	 */
-	virtual void addText(mDNS::Resource::TXT& txt)
+	virtual void addText([[maybe_unused]] mDNS::Resource::TXT& txt)
 	{
 	}
 

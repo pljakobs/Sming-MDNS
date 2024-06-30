@@ -111,10 +111,9 @@ void sendSearch()
 	myMessageHandler.setSearchName(name);
 }
 
-void gotIP(IpAddress ip, IpAddress netmask, IpAddress gateway)
+void gotIP(IpAddress ip, IpAddress, IpAddress)
 {
-	Serial.print(F("Connected. Got IP: "));
-	Serial.println(ip);
+	Serial << _F("Connected. Got IP: ") << ip << endl;
 
 	mDNS::server.onSend([](mDNS::Message& msg) {
 		printMessage(Serial, msg);
