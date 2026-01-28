@@ -121,7 +121,6 @@ private:
 	Handler::List handlers;
 	MessageDelegate sendCallback;
 	PacketDelegate packetCallback;
-	UdpOut out;
 	bool active{false};
 };
 

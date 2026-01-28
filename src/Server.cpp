@@ -41,8 +41,7 @@ bool Server::send(Message& message)
 	auto len = message.getSize();
 
 	begin();
-	out.listen(0);
-	return out.sendTo(message.getRemoteIp(), message.getRemotePort(), buf, len);
+	return sendTo(message.getRemoteIp(), message.getRemotePort(), buf, len);
 }
 
 bool Server::begin()
