@@ -58,7 +58,7 @@ bool Server::begin()
 		return false;
 	}
 
-	if(!listen(MDNS_SOURCE_PORT)) {
+	if(!out.listen(MDNS_SOURCE_PORT)) {
 		debug_e("[mDNS] listen failed");
 		return false;
 	}
