@@ -57,7 +57,7 @@ bool Server::begin()
 		return false;
 	}
 
-	if(!out.listen(MDNS_SOURCE_PORT)) {
+	if(!listen(MDNS_SOURCE_PORT)) {
 		debug_e("[mDNS] listen failed");
 		return false;
 	}
@@ -78,11 +78,6 @@ void Server::end()
 	close();
 	leaveMulticastGroup(MDNS_IP);
 	active = false;
-}
-
-void Server::UdpOut::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
-{
-	server.onReceive(buf, remoteIP, remotePort);
 }
 
 void Server::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
