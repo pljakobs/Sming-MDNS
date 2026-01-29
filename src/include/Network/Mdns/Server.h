@@ -109,19 +109,9 @@ protected:
 	void onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort) override;
 
 private:
-	/*
-	 * Need a separate UDP connection for sending requests
-	 */
-	class UdpOut : public UdpConnection
-	{
-	protected:
-		void onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort) override;
-	};
-
 	Handler::List handlers;
 	MessageDelegate sendCallback;
 	PacketDelegate packetCallback;
-	UdpOut out;
 	bool active{false};
 };
 

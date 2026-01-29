@@ -41,8 +41,7 @@ bool Server::send(Message& message)
 	auto len = message.getSize();
 
 	begin();
-	out.listen(0);
-	return out.sendTo(message.getRemoteIp(), message.getRemotePort(), buf, len);
+	return sendTo(message.getRemoteIp(), message.getRemotePort(), buf, len);
 }
 
 bool Server::begin()
@@ -79,11 +78,6 @@ void Server::end()
 	close();
 	leaveMulticastGroup(MDNS_IP);
 	active = false;
-}
-
-void Server::UdpOut::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
-{
-	server.onReceive(buf, remoteIP, remotePort);
 }
 
 void Server::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
