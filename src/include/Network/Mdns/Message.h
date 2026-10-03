@@ -22,6 +22,10 @@ constexpr uint16_t MDNS_TTL{255};
 
 constexpr uint16_t MAX_PACKET_SIZE{1024};
 
+// RFC 6762 §17: an mDNS message must not exceed 9000 bytes. Used to bound the
+// transient buffer when flattening a received pbuf chain.
+constexpr uint16_t MDNS_MAX_MESSAGE_SIZE{9000};
+
 /**
  * @brief Encapsulates a message packet for flexible introspection
  */

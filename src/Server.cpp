@@ -82,26 +82,53 @@ void Server::end()
 
 void Server::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
 {
+	// A large reply can arrive as a chain of pbufs, but the Message parser treats
+	// the payload as one flat buffer and walks name/record offsets across the
+	// whole datagram. Using only the first pbuf (buf->payload/buf->len) would
+	// read those offsets past the segment into unrelated adjacent heap, silently
+	// corrupting decoded names. Flatten the chain into one contiguous buffer.
+	uint8_t* data = static_cast<uint8_t*>(buf->payload);
+	uint16_t len = buf->len;
+	uint8_t* linearBuf = nullptr;
+	if(buf->tot_len != buf->len) {
+		// RFC 6762 §17 caps an mDNS message at 9000 bytes; reject anything larger so a
+		// malformed/oversized datagram cannot force a large transient heap allocation.
+		if(buf->tot_len > MDNS_MAX_MESSAGE_SIZE) {
+			debug_w("[mDNS] onReceive: dropping oversized %u-byte packet", buf->tot_len);
+			return;
+		}
+		linearBuf = new uint8_t[buf->tot_len];
+		if(linearBuf == nullptr) {
+			debug_e("[mDNS] onReceive: out of memory flattening %u-byte packet", buf->tot_len);
+			return;
+		}
+		pbuf_copy_partial(buf, linearBuf, buf->tot_len, 0);
+		data = linearBuf;
+		len = buf->tot_len;
+	}
+
 	if(packetCallback) {
-		if(!packetCallback(remoteIP, remotePort, static_cast<const uint8_t*>(buf->payload), buf->len)) {
+		if(!packetCallback(remoteIP, remotePort, data, len)) {
+			delete[] linearBuf;
 			return;
 		}
 	}
 
 	if(handlers.isEmpty()) {
+		delete[] linearBuf;
 		return;
 	}
 
-	Message message(remoteIP, remotePort, buf->payload, buf->len);
-	if(!message.parse()) {
-		return;
-	}
-
-	for(auto& handler : handlers) {
-		if(!handler.onMessage(message)) {
-			break;
+	Message message(remoteIP, remotePort, data, len);
+	if(message.parse()) {
+		for(auto& handler : handlers) {
+			if(!handler.onMessage(message)) {
+				break;
+			}
 		}
 	}
+
+	delete[] linearBuf;
 }
 
 } // namespace mDNS
