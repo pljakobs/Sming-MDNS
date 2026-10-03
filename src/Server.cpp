@@ -90,7 +90,7 @@ void Server::onReceive(pbuf* buf, IpAddress remoteIP, uint16_t remotePort)
 	uint8_t* data = static_cast<uint8_t*>(buf->payload);
 	uint16_t len = buf->len;
 	uint8_t* linearBuf = nullptr;
-	if(buf->tot_len != buf->len) {
+	if(buf->tot_len > buf->len) {
 		// RFC 6762 §17 caps an mDNS message at 9000 bytes; reject anything larger so a
 		// malformed/oversized datagram cannot force a large transient heap allocation.
 		if(buf->tot_len > MDNS_MAX_MESSAGE_SIZE) {
